@@ -1,0 +1,14 @@
+.credit{
+    color: gray;
+    font-size: 10px;
+}
+#board{
+    background-color: black;
+}
+td.cell{
+    background-color: antiquewhite;
+    width: 64px;
+    height: 64px;
+    font-size: 48px;
+    text-align: center;
+}
