@@ -203,4 +203,4 @@ button.addEventListener("click", () => {
     document.getElementById("info2").textContent = "";
     document.getElementById("info3").textContent = `チェス側のターンです`;
 });
-export {renderPieces};
+export {renderPieces,chessTurn};
