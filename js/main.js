@@ -46,52 +46,67 @@ document.getElementById("info3").textContent = `チェス側のターンです`;
 let chessTurn = true;//未来の自分がchess.trueかfalseかランダムにできるようにする
 let gameOver = false;
 
-function getKing(chessSide) {
+//チェック・チェックメイト判定@コパえもんに書かせたせいで中身わかんないけど動いてるからヨシ!(AA略
+function getKing(chessSide) {//自陣営のkingのdivision(chessなら12.将棋なら29)を返す
     return division.find(piece => piece.rank === 'king' && piece.chess === chessSide);
 }
 
-function isSquareAttacked(axis, attackerChess) {
+function isSquareAttacked(axis, attackerChess) {//axisのやつがattackerChessの攻撃範囲に入ってるかt/f
     return division.some(piece => {
         return piece.chess === attackerChess && piece.axis !== 'i' && checkMovable(piece).includes(axis);
     });
 }
 
-function isKingInCheck(chessSide) {
+function isKingInCheck(chessSide) {//kingがチェックかt/f
     const king = getKing(chessSide);
     return Boolean(king && king.axis !== 'i' && isSquareAttacked(king.axis, !chessSide));
 }
 
-function withTemporaryMove(piece, targetAxis, callback) {
-    const originalAxis = piece.axis;
-    const targetPiece = findPiece(targetAxis);
-    const originalTargetAxis = targetPiece ? targetPiece.axis : null;
 
-    piece.axis = targetAxis;
-    if (targetPiece) targetPiece.axis = 'i';
+function isCheckmate(chessSide) {//kingがチェックメイトかt/f
+    function canSideEscapeCheck(chessSide) {//チェック状態から脱出できるかt/f
+        return division.some(piece => {
+            if (piece.chess !== chessSide || piece.axis === 'i') return false;
+            return checkMovable(piece).some(target => {
+                const originalAxis = piece.axis;
+                const targetPiece = findPiece(target);
+                const originalTargetAxis = targetPiece ? targetPiece.axis : null;
 
-    try {
-        return callback();
-    } finally {
-        piece.axis = originalAxis;
-        if (targetPiece) targetPiece.axis = originalTargetAxis;
+                piece.axis = target;
+                if (targetPiece) targetPiece.axis = 'i';
+
+                try {
+                    return !isKingInCheck(chessSide);
+                } finally {
+                    piece.axis = originalAxis;
+                    if (targetPiece) targetPiece.axis = originalTargetAxis;
+                }
+            });
+        });
     }
-}
-
-function canSideEscapeCheck(chessSide) {
-    return division.some(piece => {
-        if (piece.chess !== chessSide || piece.axis === 'i') return false;
-        return checkMovable(piece).some(target => withTemporaryMove(piece, target, () => !isKingInCheck(chessSide)));
-    });
-}
-
-function isCheckmate(chessSide) {
     const king = getKing(chessSide);
     if (!king || king.axis === 'i') return true;
     if (!isKingInCheck(chessSide)) return false;
     return !canSideEscapeCheck(chessSide);
 }
 
-function simulateCheck(piece, targetAxis) {
+function simulateCheck(piece, targetAxis) {//piece,targetAxisいれれば
+    function withTemporaryMove(innerPiece, innerTargetAxis, callback) {
+        const originalAxis = innerPiece.axis;
+        const targetPiece = findPiece(innerTargetAxis);
+        const originalTargetAxis = targetPiece ? targetPiece.axis : null;
+
+        innerPiece.axis = innerTargetAxis;
+        if (targetPiece) targetPiece.axis = 'i';
+
+        try {
+            return callback();
+        } finally {
+            innerPiece.axis = originalAxis;
+            if (targetPiece) targetPiece.axis = originalTargetAxis;
+        }
+    }
+
     return withTemporaryMove(piece, targetAxis, () => {
         const selfInCheck = isKingInCheck(piece.chess);
         const opponentChess = !piece.chess;
