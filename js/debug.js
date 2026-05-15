@@ -23,9 +23,5 @@ function debug_chesscheckmate(chess){
     }else 
         return console.log("true/falseで指定してください");
 }
-function debug_changeturn(){
-    chessTurn = !chessTurn;
-    document.getElementById("info3").textContent = `${chessTurn? "チェス" : "将棋"}側のターンです`;
-}
+
 window.debug_chesscheckmate = debug_chesscheckmate;//なにこれ??
-window.debug_changeturn = debug_changeturn;//なにこれ??
