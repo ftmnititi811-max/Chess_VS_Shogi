@@ -124,12 +124,12 @@ let legalMoves = [];//うごけるとこ["a1","b2"]みたく代入
 function clicked(e){
     const clickedId = e.currentTarget.id;   
     if(gameOver){
-        document.getElementById("info").textContent = "ゲームは終了しています";
+        document.getElementById("info_turn").textContent = "ゲームは終了しています";
         return;
     }
     if(selectPiece){//2ndclicked
         if(selectPiece.axis === clickedId){//同じとこ選択=>解除
-            document.getElementById("info").textContent = "選択が解除されました";
+            document.getElementById("info_move").textContent = "選択が解除されました";
             document.getElementById("info_status").textContent = "";
             document.getElementById("info_turn").textContent = "";
             selectPiece = null;
@@ -137,7 +137,7 @@ function clicked(e){
         }else if(legalMoves.includes(clickedId)){//動けるとこ選択
             const moveResult = simulateCheck(selectPiece, clickedId);
             if (moveResult.selfInCheck){//チェック解除しない手を選択
-                document.getElementById("info").textContent = "その手はチェック/王手を解除できません";
+                document.getElementById("info_move").textContent = "その手はチェック/王手を解除できません";
                 document.getElementById("info_status").textContent = "";
                 document.getElementById("info_turn").textContent = "";
                 selectPiece = null;
@@ -190,12 +190,12 @@ function clicked(e){
                     const cell = document.getElementById(id);
                     if (cell) cell.style.backgroundColor = "lightgreen";
                 });
-                document.getElementById("info").textContent = "コマを選択しました";
+                document.getElementById("info_move").textContent = "コマを選択しました";
             }else {//↑=false
-                document.getElementById("info").textContent = "相手のターンです";
+                document.getElementById("info_move").textContent = "相手のターンです";
             }
         }else {//↑=false
-            document.getElementById("info").textContent = "コマを選択してください";
+            document.getElementById("info_move").textContent = "コマを選択してください";
         }
     }
 }
