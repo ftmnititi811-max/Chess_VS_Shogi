@@ -1,8 +1,8 @@
 import {division} from './piece.js';
-import {renderPieces,chessTurn} from './main.js';
+import {renderPieces,setChessTurn} from './main.js';
 //debug
 function debug_chesscheckmate(chess){
-    let chessTurn = true;
+    setChessTurn(true);
     for (let i = 0; i < division.length; i++) {
             division[i].axis = "i";
     }
@@ -13,12 +13,12 @@ function debug_chesscheckmate(chess){
         division[29].axis = "e9"; // 王
         renderPieces();
     }else if(chess == false){
-        let chessTurn = false;
+        setChessTurn(false);
         //歩=>e7
-        division[12].axis = "e9"; //king
+        division[12].axis = "e1"; //king
         division[29].axis = "d9"; //王
-        division[30].axis = "e8"; //金
-        division[16].axis = "e6"; //歩
+        division[30].axis = "e2"; //金
+        division[16].axis = "e4"; //歩
         renderPieces();
     }else 
         return console.log("true/falseで指定してください");

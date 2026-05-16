@@ -44,6 +44,10 @@ document.getElementById("info_turn").textContent = `チェス側のターンで�
 //制御系
 let chessTurn = true;//未来の自分がchess.trueかfalseかランダムにできるようにする
 let gameOver = false;
+function setChessTurn(value) {
+    chessTurn = value;
+    document.getElementById("info_turn").textContent = `${chessTurn ? "チェス" : "将棋"}側のターンです`;
+}
 
 //チェック・チェックメイト判定@コパえもんに書かせたせいで中身わかんないけど動いてるからヨシ!(AA略
 function getKing(chessSide) {//自陣営のkingのdivision(chessなら12.将棋なら29)を返す
@@ -162,8 +166,7 @@ function clicked(e){
                 if (moveResult.opponentCheck) {
                     info_statusText = info_statusText ? `${info_statusText} チェックです` : "チェックです";
                 }
-                chessTurn = !chessTurn;
-                document.getElementById("info_turn").textContent = `${chessTurn? "チェス" : "将棋"}側のターンです`;
+                setChessTurn(!chessTurn);
             }
             document.getElementById("info_status").textContent = info_statusText;
             addLog(selectPiece.symbol + clickedId);
@@ -209,7 +212,7 @@ button.addEventListener("click", () => {
     selectPiece = null;
     legalMoves = [];
     log = [];
-    chessTurn = true;
+    setChessTurn(true);
     gameOver = false;
     summonpiece();
     renderPieces();
@@ -218,4 +221,4 @@ button.addEventListener("click", () => {
     document.getElementById("info_status").textContent = "";
     document.getElementById("info_turn").textContent = `チェス側のターンです`;
 });
-export {renderPieces,chessTurn};
+export {renderPieces,setChessTurn};
