@@ -149,6 +149,30 @@ function checkMovable(piece){//コマの動きの判定
                 }
             });
             break;
+        case "dragon":
+            continueMove([[1,0],[-1,0],[0,1],[0,-1]]);
+            [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dx, dy]) => {
+                let ex = width + dx, ey = height + dy;
+                if (ex >= 0 && ex < 8 && ey > 0 && ey <= 9) {
+                    let targetPiece = findPiece(yoko[ex] + ey);
+                    if (!targetPiece || targetPiece.chess !== piece.chess) {
+                        movable.push(yoko[ex] + ey);
+                    }
+                }
+            });
+            break;
+        case "horse":
+            continueMove([[1,1],[1,-1],[-1,1],[-1,-1]]);
+            [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx, dy]) => {
+                let ex = width + dx, ey = height + dy;
+                if (ex >= 0 && ex < 8 && ey > 0 && ey <= 9) {
+                    let targetPiece = findPiece(yoko[ex] + ey);
+                    if (!targetPiece || targetPiece.chess !== piece.chess) {
+                        movable.push(yoko[ex] + ey);
+                    }
+                }
+            });
+            break;
         }
     }
     return movable;

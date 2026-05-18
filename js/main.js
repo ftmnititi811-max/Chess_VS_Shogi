@@ -127,7 +127,16 @@ function Promotion(piece) {
     if (piece.rank === "pawn" && piece.chess === true) {
         piece.rank = "queen";
         piece.symbol = "♕";
-    }//将棋は未来の自分にまかせる
+    }else if(piece.rank === "pawn"||piece.rank === "lance"||piece.rank === "knight"||piece.rank === "silver" && piece.chess === false) {
+        piece.rank = "gold";
+        piece.symbol = "金";
+    }else if (piece.rank ==="rook"&& piece.chess === false){
+        piece.rank = "dragon";
+        piece.symbol = "龍";
+    }else if (piece.rank ==="bishop"&& piece.chess === false){
+        piece.rank = "horse";
+        piece.symbol = "馬";
+    }
 }
 
 
@@ -166,7 +175,7 @@ function clicked(e){
                 info_statusText = (defeatedSymbol || "不明") + "を撃破しました";
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
-            if (selectPiece.axis[1] === "9"){
+            if ((selectPiece.axis[1] === "9" && selectPiece.chess === true) || (selectPiece.axis[1] === "1"||selectPiece.axis[1] === "2"||selectPiece.axis[1] === "3" && selectPiece.chess === false)){
                 Promotion(selectPiece);//成り判定
                 console.log("promote success");
             }
