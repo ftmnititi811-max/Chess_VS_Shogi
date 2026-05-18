@@ -122,6 +122,15 @@ function simulateCheck(piece, targetAxis) {//piece,targetAxisいれれば
     });
 }
 
+//成りとか
+function Promotion(piece) {
+    if (piece.rank === "pawn" && piece.chess === true) {
+        piece.rank = "queen";
+        piece.symbol = "♕";
+    }//将棋は未来の自分にまかせる
+}
+
+
 //コマ移動
 let selectPiece = null;//findPieceでdivision[n]いれる
 let legalMoves = [];//うごけるとこ["a1","b2"]みたく代入
@@ -157,6 +166,10 @@ function clicked(e){
                 info_statusText = (defeatedSymbol || "不明") + "を撃破しました";
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
+            if (selectPiece.axis[1] === "9"){
+                Promotion(selectPiece);//成り判定
+                console.log("promote success");
+            }
             document.getElementById("info_move").textContent = "コマを" + clickedId + "に移動しました";
             if (moveResult.opponentCheckmate) {
                 info_statusText = info_statusText ? `${info_statusText} チェックメイト！` : "チェックメイト！";
