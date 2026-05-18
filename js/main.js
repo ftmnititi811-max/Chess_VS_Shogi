@@ -176,8 +176,11 @@ function clicked(e){
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
             if ((selectPiece.axis[1] === "9" && selectPiece.chess === true) || (selectPiece.axis[1] === "1"||selectPiece.axis[1] === "2"||selectPiece.axis[1] === "3" && selectPiece.chess === false)){
+                const promote = confirm("成りますか？");
+                if (promote){
                 Promotion(selectPiece);//成り判定
                 console.log("promote success");
+                }
             }
             document.getElementById("info_move").textContent = "コマを" + clickedId + "に移動しました";
             if (moveResult.opponentCheckmate) {
