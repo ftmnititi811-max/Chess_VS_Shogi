@@ -1,8 +1,8 @@
 import {division} from './piece.js';
-import {renderPieces,setChessTurn} from './main.js';
+import {renderPieces,setChessTurn,resetGame} from './main.js';
 //debug
 function debug_chesscheckmate(chess){
-    setChessTurn(true);
+    resetGame();
     for (let i = 0; i < division.length; i++) {
             division[i].axis = "i";
     }
