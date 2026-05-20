@@ -1,19 +1,30 @@
+/*
+[やること]
+特殊ルール実装　持ち時間　1p2pのターン設定 AI作成
+まった log ルール変更(将棋の持ち駒にdata=Capturedとかつけてチェス側でそれとったらチェス陣営に変更とか)
+[実装予定の特殊ルール]
+千日手(3回繰り返したらひきわけになるやつ) ステイルメイト(なんかうごけないとひきわけになるやつ)
+キャスリング(キングがなんかうごくやつ) 将棋のコマ置き(金歩) アンバッサン(ポーンがきもい動きするやつ)
+*/
+
 //import
 import {division,yoko,summonpiece} from './piece.js';
 import {checkMovable,findPiece} from './definemove.js';
 //ボード
 function renderPieces() {//ボードをdivision.axisの値に更新
     document.querySelectorAll(".cell").forEach(td => td.textContent = "");
-    let renderedCount = 0;
     for (let i = 0; i < division.length; i++) {
         if(division[i].axis[0] !== "i"){
             document.getElementById(division[i].axis).textContent = division[i].symbol;
-            renderedCount++;
         }
     }
     if (!isGameOver) {
         document.getElementById("info_turn").textContent = `${chessTurn ? "チェス" : "将棋"}側のターンです`;
     }
+}
+
+function deleteHighlight() {//highlightをdeleteする
+    document.querySelectorAll(".cell").forEach(td => td.style.backgroundColor = "");
 }
 
 function summonboard() {//domでボードつくる
@@ -33,7 +44,7 @@ function summonboard() {//domでボードつくる
     summonpiece();
     renderPieces();
 }
-document.addEventListener("DOMContentLoaded", summonboard);
+document.addEventListener("DOMContentLoaded", summonboard);//未来の自分がdomcontentloadedからスタート押したときとかにする
 
 //ログとかinfoとか
 let log = [];//多分いつか感想戦とかできるようになるかも
@@ -128,8 +139,8 @@ function simulateCheck(piece, targetAxis) {//piece,targetAxisいれれば
     });
 }
 
-//成りとか
-function Promotion(piece) {
+//制御...?
+function Promotion(piece) {//成るやつ
     if (piece.rank === "pawn" && piece.chess === true) {
         piece.rank = "queen";
         piece.symbol = "♕";
@@ -145,11 +156,9 @@ function Promotion(piece) {
     }
 }
 
-
-//コマ移動
 let selectPiece = null;//findPieceでdivision[n]いれる
 let legalMoves = [];//うごけるとこ["a1","b2"]みたく代入
-function clicked(e){
+function clicked(e){//未来の自分がリファクタするはず
     const clickedId = e.currentTarget.id;   
     if(isGameOver){
         document.getElementById("info_status").textContent = "ゲームは終了しています";
@@ -236,9 +245,6 @@ function clicked(e){
             document.getElementById("info_move").textContent = "コマを選択してください";
         }
     }
-}
-function deleteHighlight() {//highlightをdeleteする
-    document.querySelectorAll(".cell").forEach(td => td.style.backgroundColor = "");
 }
 
 //ボタン@ß終了時にたぶんかえる
