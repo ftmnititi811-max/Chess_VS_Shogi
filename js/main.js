@@ -177,24 +177,29 @@ function clicked(e){
                 const defeatedSymbol = targetPiece.symbol;
                 targetPiece.axis = "i";
                 info_statusText = (defeatedSymbol || "不明") + "を撃破しました";
+                if(targetPiece.rank === "king"){
+                isGameOver = true;
+                gameOver();
+                info_statusText = `${chessTurn ? "王将" : "キング"}が撃破されました。${chessTurn ? "チェス" : "将棋"}の勝利です`;
+            }
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
             if ((selectPiece.axis[1] === "9" && selectPiece.chess === true) || (selectPiece.axis[1] === "1"||selectPiece.axis[1] === "2"||selectPiece.axis[1] === "3" && selectPiece.chess === false)){
                 if((selectPiece.rank === "pawn"||selectPiece.rank === "lance"||selectPiece.rank === "silver")||(selectPiece.chess === false && selectPiece.rank === "knight"||selectPiece.rank === "rook"||selectPiece.rank === "bishop")){
-                    const promote = confirm("成りますか？");
-                    if (promote){//がんばれ未来の自分
-                    Promotion(selectPiece);//成り判定
+                    const promote = confirm("成りますか？");//成り判定
+                    if (promote){
+                    Promotion(selectPiece);
                     console.log("promote success");
                     }
                 }
             }
             document.getElementById("info_move").textContent = "コマを" + clickedId + "に移動しました";
-            if (moveResult.opponentCheckmate) {
+            if (moveResult.opponentCheckmate && !isGameOver) {
                 isGameOver = true;
                 gameOver();
-                info_statusText = info_statusText ? `${info_statusText} チェックメイトです` : "チェックメイトです";
+                info_statusText =`チェックメイトです。${chessTurn ? "チェス" : "将棋"}の勝利です`;
             } else {
-                if (moveResult.opponentCheck) {
+                if (moveResult.opponentCheck && !isGameOver) {
                     info_statusText = info_statusText ? `${info_statusText} チェックです` : "チェックです";
                 }//ステイルメイト確認 がんばれ未来の自分
                 setChessTurn(!chessTurn);
@@ -263,6 +268,6 @@ surrenderButton.addEventListener("click", () => {
     isGameOver = true;
     gameOver();
     document.getElementById("info_move").textContent = "";
-    document.getElementById("info_status").textContent = "サレンダーされました";
+    document.getElementById("info_status").textContent = `サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`;
 });
 export {renderPieces,setChessTurn,resetGame};
