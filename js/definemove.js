@@ -1,5 +1,5 @@
 //動作系
-import {division,yoko,summonpiece} from './piece.js';
+import {division,yoko} from './piece.js';
 
 function findPiece(axis) {//axisにコマがいるかチェック
     for (let i = 0; i < division.length; i++) {
@@ -37,7 +37,7 @@ function checkMovable(piece){//コマの動きの判定
     if(piece.chess == true){//チェスのコマ動き制御
         switch(piece.rank){
         case "pawn":
-            let nextY = height + 1;
+            { let nextY = height + 1;
             if (nextY <= 9 && !findPiece(piece.axis[0] + nextY)) {
                 movable.push(piece.axis[0] + nextY);
                 //なんか2歩動くやつ
@@ -55,7 +55,7 @@ function checkMovable(piece){//コマの動きの判定
                     }
                 }
             });
-            break;
+            break; }
         case "rook":
             continueMove([[1,0],[-1,0],[0,1],[0,-1]]);
             break;
@@ -91,11 +91,11 @@ function checkMovable(piece){//コマの動きの判定
     }else{
         switch(piece.rank){//将棋のコマ動き制御
         case "pawn":
-                let nextY = height - 1;
+                { let nextY = height - 1;
             if (nextY > 0 && (!findPiece(piece.axis[0] + nextY) || findPiece(piece.axis[0] + nextY).chess !== piece.chess)) {
                 movable.push(piece.axis[0] + nextY);
             }
-            break;
+            break; }
         case "rook":
             continueMove([[1,0],[-1,0],[0,1],[0,-1]]);
             break;

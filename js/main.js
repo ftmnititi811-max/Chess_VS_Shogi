@@ -1,6 +1,6 @@
 /*
 [やること]
-特殊ルール実装　持ち時間　1p2pのターン設定 AI作成
+特殊ルール実装 持ち時間 1p2pのターン設定 AI作成
 まった log ルール変更(将棋の持ち駒にdata=Capturedとかつけてチェス側でそれとったらチェス陣営に変更とか)
 [実装予定の特殊ルール]
 千日手(3回繰り返したらひきわけになるやつ) ステイルメイト(なんかうごけないとひきわけになるやつ)
@@ -10,6 +10,7 @@
 //import
 import {division,yoko,summonpiece} from './piece.js';
 import {checkMovable,findPiece} from './definemove.js';
+import {setChessTurn,chessTurn,addLog,simulateCheck,Promotion,isGameOver,setGameOver} from "./controll.js";
 //ボード
 function renderPieces() {//ボードをdivision.axisの値に更新
     document.querySelectorAll(".cell").forEach(td => td.textContent = "");
@@ -46,115 +47,6 @@ function summonboard() {//domでボードつくる
 }
 document.addEventListener("DOMContentLoaded", summonboard);//未来の自分がdomcontentloadedからスタート押したときとかにする
 
-//ログとかinfoとか
-let log = [];//多分いつか感想戦とかできるようになるかも
-function addLog(action) {
-    log.push(action);
-    console.log(action);
-}
-
-//制御系
-let chessTurn = true;//未来の自分がchess.trueかfalseかランダムにできるようにする
-let isGameOver = false;
-function setChessTurn(value) {
-    chessTurn = value;
-}
-function gameOver(){
-    if(!isGameOver){
-        return console.log("not gameover");
-    }
-    document.getElementById("info_turn").textContent = "ゲーム終了";
-}
-
-//チェック・チェックメイト判定@コパえもんに書かせたせいで中身わかんないけど動いてるからヨシ!(AA略
-function getKing(chessSide) {//自陣営のkingのdivision(chessなら12.将棋なら29)を返す
-    return division.find(piece => piece.rank === 'king' && piece.chess === chessSide);
-}
-
-function isSquareAttacked(axis, attackerChess) {//axisのやつがattackerChessの攻撃範囲に入ってるかt/f
-    return division.some(piece => {
-        return piece.chess === attackerChess && piece.axis !== 'i' && checkMovable(piece).includes(axis);
-    });
-}
-
-function isKingInCheck(chessSide) {//kingがチェックかt/f
-    const king = getKing(chessSide);
-    return Boolean(king && king.axis !== 'i' && isSquareAttacked(king.axis, !chessSide));
-}
-
-
-function isCheckmate(chessSide) {//kingがチェックメイトかt/f
-    function canSideEscapeCheck(chessSide) {//チェック状態から脱出できるかt/f
-        return division.some(piece => {
-            if (piece.chess !== chessSide || piece.axis === 'i') return false;
-            return checkMovable(piece).some(target => {
-                const originalAxis = piece.axis;
-                const targetPiece = findPiece(target);
-                const originalTargetAxis = targetPiece ? targetPiece.axis : null;
-
-                piece.axis = target;
-                if (targetPiece) targetPiece.axis = 'i';
-
-                try {
-                    return !isKingInCheck(chessSide);
-                } finally {
-                    piece.axis = originalAxis;
-                    if (targetPiece) targetPiece.axis = originalTargetAxis;
-                }
-            });
-        });
-    }
-    const king = getKing(chessSide);
-    if (!king || king.axis === 'i') return true;
-    if (!isKingInCheck(chessSide)) return false;
-    return !canSideEscapeCheck(chessSide);
-}
-
-function simulateCheck(piece, targetAxis) {//piece,targetAxisいれれば
-    function withTemporaryMove(innerPiece, innerTargetAxis, callback) {
-        const originalAxis = innerPiece.axis;
-        const targetPiece = findPiece(innerTargetAxis);
-        const originalTargetAxis = targetPiece ? targetPiece.axis : null;
-
-        innerPiece.axis = innerTargetAxis;
-        if (targetPiece) targetPiece.axis = 'i';
-
-        try {
-            return callback();
-        } finally {
-            innerPiece.axis = originalAxis;
-            if (targetPiece) targetPiece.axis = originalTargetAxis;
-        }
-    }
-
-    return withTemporaryMove(piece, targetAxis, () => {
-        const selfInCheck = isKingInCheck(piece.chess);
-        const opponentChess = !piece.chess;
-        const opponentCheck = isKingInCheck(opponentChess);
-        return {
-            selfInCheck,
-            opponentCheck,
-            opponentCheckmate: isCheckmate(opponentChess)
-        };
-    });
-}
-
-//制御...?
-function Promotion(piece) {//成るやつ
-    if (piece.rank === "pawn" && piece.chess === true) {
-        piece.rank = "queen";
-        piece.symbol = "♕";
-    }else if(piece.rank === "pawn"||piece.rank === "lance"||piece.rank === "knight"||piece.rank === "silver" && piece.chess === false) {
-        piece.rank = "gold";
-        piece.symbol = "金";
-    }else if (piece.rank ==="rook"&& piece.chess === false){
-        piece.rank = "dragon";
-        piece.symbol = "龍";
-    }else if (piece.rank ==="bishop"&& piece.chess === false){
-        piece.rank = "horse";
-        piece.symbol = "馬";
-    }
-}
 
 let selectPiece = null;//findPieceでdivision[n]いれる
 let legalMoves = [];//うごけるとこ["a1","b2"]みたく代入
@@ -187,8 +79,7 @@ function clicked(e){//未来の自分がリファクタするはず
                 targetPiece.axis = "i";
                 info_statusText = (defeatedSymbol || "不明") + "を撃破しました";
                 if(targetPiece.rank === "king"){
-                isGameOver = true;
-                gameOver();
+                setGameOver(true);
                 info_statusText = `${chessTurn ? "王将" : "キング"}が撃破されました。${chessTurn ? "チェス" : "将棋"}の勝利です`;
             }
             }
@@ -204,8 +95,7 @@ function clicked(e){//未来の自分がリファクタするはず
             }
             document.getElementById("info_move").textContent = "コマを" + clickedId + "に移動しました";
             if (moveResult.opponentCheckmate && !isGameOver) {
-                isGameOver = true;
-                gameOver();
+                setGameOver(true);
                 info_statusText =`チェックメイトです。${chessTurn ? "チェス" : "将棋"}の勝利です`;
             } else {
                 if (moveResult.opponentCheck && !isGameOver) {
@@ -251,9 +141,8 @@ function clicked(e){//未来の自分がリファクタするはず
 function resetGame(){
     selectPiece = null;
     legalMoves = [];
-    log = [];
     setChessTurn(true);
-    isGameOver = false;
+    setGameOver(false);
     summonpiece();
     renderPieces();
     deleteHighlight();
@@ -271,9 +160,8 @@ surrenderButton.addEventListener("click", () => {
         document.getElementById("info_status").textContent = "ゲームは終了しています";
         return;
     }
-    isGameOver = true;
-    gameOver();
+    setGameOver(true);
     document.getElementById("info_move").textContent = "";
     document.getElementById("info_status").textContent = `サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`;
 });
-export {renderPieces,setChessTurn,resetGame};
+export {renderPieces,resetGame};
