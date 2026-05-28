@@ -1,4 +1,4 @@
-import {division} from './piece.js';
+/*import {division} from './piece.js';
 import {renderPieces,setChessTurn,resetGame} from './main.js';
 //debug
 function debug_chesscheckmate(chess){
@@ -24,4 +24,4 @@ function debug_chesscheckmate(chess){
         return console.log("true/falseで指定してください");
 }
 
-window.debug_chesscheckmate = debug_chesscheckmate;//なにこれ??
+window.debug_chesscheckmate = debug_chesscheckmate;//なにこれ??*/

@@ -7,10 +7,11 @@
 キャスリング(キングがなんかうごくやつ) 将棋のコマ置き(金歩) アンバッサン(ポーンがきもい動きするやつ)
 */
 
-//import
-import {division,yoko,summonpiece} from './piece.js';
-import {checkMovable,findPiece} from './definemove.js';
-import {setChessTurn,chessTurn,addLog,simulateCheck,Promotion,isGameOver,setGameOver} from "./controll.js";
+//ゲーム制御
+import {yoko,summonPiece,promotion,findPiece,division} from './piece.js';
+import {checkMovable} from './definemove.js';
+import {setChessTurn,chessTurn,addLog,simulateCheck,isGameOver,setGameOver} from "./controll.js";
+
 //ボード
 function renderPieces() {//ボードをdivision.axisの値に更新
     document.querySelectorAll(".cell").forEach(td => td.textContent = "");
@@ -42,7 +43,7 @@ function summonboard() {//domでボードつくる
         }
         board.appendChild(tr);
     }
-    summonpiece();
+    summonPiece();
     renderPieces();
 }
 document.addEventListener("DOMContentLoaded", summonboard);//未来の自分がdomcontentloadedからスタート押したときとかにする
@@ -88,7 +89,7 @@ function clicked(e){//未来の自分がリファクタするはず
                 if((selectPiece.rank === "pawn"||selectPiece.rank === "lance"||selectPiece.rank === "silver")||(selectPiece.chess === false && selectPiece.rank === "knight"||selectPiece.rank === "rook"||selectPiece.rank === "bishop")){
                     const promote = confirm("成りますか？");//成り判定
                     if (promote){
-                    Promotion(selectPiece);
+                    promotion(selectPiece);
                     console.log("promote success");
                     }
                 }
@@ -143,7 +144,7 @@ function resetGame(){
     legalMoves = [];
     setChessTurn(true);
     setGameOver(false);
-    summonpiece();
+    summonPiece();
     renderPieces();
     deleteHighlight();
     document.getElementById("info_move").textContent = "";

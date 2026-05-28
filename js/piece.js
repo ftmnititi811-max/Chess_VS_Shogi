@@ -1,6 +1,6 @@
-//左から順にa~h　下から順に0~9でid
+//piece制御関連
 const yoko =["a","b","c","d","e","f","g","h"]
-
+const tate =["1","2","3","4","5","6","7","8","9"]
 class piece {
     constructor(chess, rank, symbol, axis) {
         this.chess = chess;
@@ -10,7 +10,9 @@ class piece {
     }
 }
 let division = [];
-function summonpiece(){//division内の配列にobjectでコマと初期座標セット
+
+//========初期設定========
+function summonPiece(){//division内の配列にobjectでコマと初期座標セット
     for (let i=0; i<8; i++){
         division[i] = new piece(true,"pawn","♙",yoko[i]+"2");
     }
@@ -38,4 +40,46 @@ function summonpiece(){//division内の配列にobjectでコマと初期座標�
     division[32] = new piece(false,"knight","桂","g9")
     division[33] = new piece(false,"lance","香","h9")
 }
-export { division, yoko, summonpiece };
+
+//========読み取り/書き換え========
+function findPiece(axis) {//axisにコマがいるかチェック
+    for (let i = 0; i < division.length; i++) {
+        if (division[i].axis === axis) {
+            return division[i];
+        }
+    }
+    return null;
+}
+function getDivision() {
+    return division;
+}
+
+const movePiece = (piece,to) => {//pieceをtoへうごかす
+    piece.axis = to;
+}
+const deletePiece = (piece) =>{//pieceをヨコ座標iへ飛ばす
+    piece.axis[0] = i;
+}
+
+function promotion(piece) {//成るやつ
+    if (piece.rank === "pawn" && piece.chess === true) {
+        piece.rank = "queen";
+        piece.symbol = "♕";
+    }else if((piece.rank === "pawn" || piece.rank === "lance" || piece.rank ==="knight" || piece.rank === "silver") && piece.chess === false) {
+        piece.rank = "gold";
+        piece.symbol = "金";
+    }else if (piece.rank ==="rook"&& piece.chess === false){
+        piece.rank = "dragon";
+        piece.symbol = "龍";
+    }else if (piece.rank ==="bishop"&& piece.chess === false){
+        piece.rank = "horse";
+        piece.symbol = "馬";
+    }
+}
+export {yoko, tate,
+        summonPiece,
+        findPiece,getDivision,
+        movePiece,deletePiece,
+        promotion,
+        division
+        };

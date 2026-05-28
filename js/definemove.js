@@ -1,14 +1,5 @@
-//動作系
-import {division,yoko} from './piece.js';
-
-function findPiece(axis) {//axisにコマがいるかチェック
-    for (let i = 0; i < division.length; i++) {
-        if (division[i].axis === axis) {
-            return division[i];
-        }
-    }
-    return null;
-}
+//piece動きの定義
+import {findPiece,yoko} from './piece.js';
 
 function checkMovable(piece){//コマの動きの判定
     const width = yoko.indexOf(piece.axis[0]);
@@ -177,4 +168,4 @@ function checkMovable(piece){//コマの動きの判定
     }
     return movable;
 }
-export {checkMovable,findPiece};
+export {checkMovable};
