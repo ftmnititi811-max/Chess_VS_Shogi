@@ -1,6 +1,19 @@
 //内部処理系(ターン管理とか)
 import {checkMovable} from "./definemove.js";
-import {findPiece,getDivision} from "./piece.js"
+import { deleteHighlight, renderPieces , messageMove , messageStatus } from "./graphics.js";
+import {findPiece,getDivision, summonPiece} from "./piece.js"
+
+//========初期化========
+const startGame=()=>{
+    console.clear();
+    setChessTurn(true);
+    setGameOver(false);
+    summonPiece();
+    renderPieces();
+    deleteHighlight();
+    messageMove(null);
+    messageStatus(null);
+}
 
 //========ログとか=======
 function addLog(action) {//多分いつか感想戦とかできるようになるかも
@@ -16,9 +29,15 @@ function setChessTurn(value) {
 function setGameOver(value){
     isGameOver = value;
 }
+const getGameOver=()=>{
+    return isGameOver;
+}
+const getChessTurn=()=>{
+    return chessTurn;
+}
 
 /*========チェック・チェックメイト判定========
-コパえもんに書かせたせいで中身わかんないけど動いてるからヨシ!(AA略*/
+コパえもんに書かせたせいで中身わかんないけど動いてるからヨシ!(AA略 vite移行前にはリファクタします*/
 function getKing(chessSide) {//自陣営のkingのdivision(chessなら12.将棋なら29)を返す
     const division =getDivision();
     return division.find(piece => piece.rank === 'king' && piece.chess === chessSide);
@@ -95,4 +114,4 @@ function simulateCheck(piece, targetAxis) {//piece,targetAxisいれれば
     });
 }
 
-export {setChessTurn,chessTurn,setGameOver,addLog,simulateCheck,isGameOver};
+export {setChessTurn,setGameOver,addLog,simulateCheck,getGameOver,getChessTurn,startGame};

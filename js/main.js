@@ -8,66 +8,37 @@
 */
 
 //ゲーム制御
-import {yoko,summonPiece,promotion,findPiece,division} from './piece.js';
+import {yoko,summonPiece,promotion,findPiece,getDivision} from './piece.js';
 import {checkMovable} from './definemove.js';
-import {setChessTurn,chessTurn,addLog,simulateCheck,isGameOver,setGameOver} from "./controll.js";
+import {setChessTurn,addLog,simulateCheck,getGameOver,setGameOver, getChessTurn,startGame} from "./controll.js";
+import {summonBoard,deleteHighlight,renderPieces,messageStatus,messageMove,messageWin,messageTurn} from './graphics.js';
+import {debug_chesscheckmate} from './debug.js';
 
-//ボード
-function renderPieces() {//ボードをdivision.axisの値に更新
-    document.querySelectorAll(".cell").forEach(td => td.textContent = "");
-    for (let i = 0; i < division.length; i++) {
-        if(division[i].axis[0] !== "i"){
-            document.getElementById(division[i].axis).textContent = division[i].symbol;
-        }
-    }
-    if (!isGameOver) {
-        document.getElementById("info_turn").textContent = `${chessTurn ? "チェス" : "将棋"}側のターンです`;
-    }
-}
+//========メインパーツ========
+document.addEventListener("DOMContentLoaded", summonBoard());//未来の自分がdomcontentloadedからスタート押したときとかにする
+startGame();
 
-function deleteHighlight() {//highlightをdeleteする
-    document.querySelectorAll(".cell").forEach(td => td.style.backgroundColor = "");
-}
-
-function summonboard() {//domでボードつくる
-    let board = document.getElementById("board");
-    board.innerHTML = "";
-    for (let i = 0; i < 9; i++ ){
-        let tr = document.createElement("tr");
-        for (let ii = 0; ii < 8 ; ii++){
-            let td = document.createElement("td");
-            td.className = "cell";
-            td.id = yoko[ii] + (9-i);
-            td.onclick = clicked;
-            tr.appendChild(td);
-        }
-        board.appendChild(tr);
-    }
-    summonPiece();
-    renderPieces();
-}
-document.addEventListener("DOMContentLoaded", summonboard);//未来の自分がdomcontentloadedからスタート押したときとかにする
-
-
+//========clicked========
 let selectPiece = null;//findPieceでdivision[n]いれる
 let legalMoves = [];//うごけるとこ["a1","b2"]みたく代入
-function clicked(e){//未来の自分がリファクタするはず
-    const clickedId = e.currentTarget.id;   
+export function clicked(e){//未来の自分がリファクタするはず
+    const chessTurn = getChessTurn();
+    const isGameOver = getGameOver();
+    const division = getDivision();
+    const clickedId = e.currentTarget.id;
     if(isGameOver){
-        document.getElementById("info_status").textContent = "ゲームは終了しています";
+        messageStatus("ゲームは終了しています");
         return;
     }
     if(selectPiece){//2ndclicked
         if(selectPiece.axis === clickedId){//同じとこ選択=>解除
-            document.getElementById("info_move").textContent = "選択が解除されました";
-            document.getElementById("info_status").textContent = "";
+            messageStatus("選択が解除されました");
             selectPiece = null;
             deleteHighlight();
         }else if(legalMoves.includes(clickedId)){//動けるとこ選択
             const moveResult = simulateCheck(selectPiece, clickedId);
             if (moveResult.selfInCheck){//チェック解除しない手を選択
-                document.getElementById("info_move").textContent = "その手はチェック/王手を解除できません";
-                document.getElementById("info_status").textContent = "";
+                messageStatus("その手はチェック/王手を解除できません");
                 selectPiece = null;
                 legalMoves = [];
                 deleteHighlight();
@@ -82,6 +53,7 @@ function clicked(e){//未来の自分がリファクタするはず
                 if(targetPiece.rank === "king"){
                 setGameOver(true);
                 info_statusText = `${chessTurn ? "王将" : "キング"}が撃破されました。${chessTurn ? "チェス" : "将棋"}の勝利です`;
+                messageTurn(null);
             }
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
@@ -94,7 +66,7 @@ function clicked(e){//未来の自分がリファクタするはず
                     }
                 }
             }
-            document.getElementById("info_move").textContent = "コマを" + clickedId + "に移動しました";
+            messageMove(clickedId);
             if (moveResult.opponentCheckmate && !isGameOver) {
                 setGameOver(true);
                 info_statusText =`チェックメイトです。${chessTurn ? "チェス" : "将棋"}の勝利です`;
@@ -104,15 +76,14 @@ function clicked(e){//未来の自分がリファクタするはず
                 }//ステイルメイト確認 がんばれ未来の自分
                 setChessTurn(!chessTurn);
             }
-            document.getElementById("info_status").textContent = info_statusText;
+            messageStatus(info_statusText);
             addLog(selectPiece.symbol + clickedId);
             selectPiece = null;
             legalMoves = [];
             renderPieces();
             deleteHighlight();
         }else{//違うとこ選択
-            document.getElementById("info_move").textContent = "そこには移動できません";
-            document.getElementById("info_status").textContent = "";
+            messageStatus("そこには移動できません");
             selectPiece = null;
             legalMoves = [];
             deleteHighlight();
@@ -128,41 +99,36 @@ function clicked(e){//未来の自分がリファクタするはず
                     const cell = document.getElementById(id);
                     if (cell) cell.style.backgroundColor = "lightgreen";
                 });
-                document.getElementById("info_move").textContent = "コマを選択しました";
+                messageStatus("コマを選択しました");
             }else {//↑=false
-                document.getElementById("info_move").textContent = "相手のターンです";
+                messageStatus("相手のターンです");
             }
         }else {//↑=false
-            document.getElementById("info_move").textContent = "コマを選択してください";
+            messageStatus("コマを選択してください");
         }
     }
 }
 
-//ボタン@ß終了時にたぶんかえる
-function resetGame(){
-    selectPiece = null;
-    legalMoves = [];
-    setChessTurn(true);
-    setGameOver(false);
-    summonPiece();
-    renderPieces();
-    deleteHighlight();
-    document.getElementById("info_move").textContent = "";
-    document.getElementById("info_status").textContent = "";
-    document.getElementById("info_turn").textContent =`${chessTurn ? "チェス" : "将棋"}側のターンです`;
-}
+//========ボタン========
+//ß終了時にたぶんかえる
 const button = document.querySelector("#reset");
 button.addEventListener("click", () => {
-    resetGame();
+    startGame();
+    console.log("reset succeed");
 });
+
 const surrenderButton = document.querySelector("#surrender");
 surrenderButton.addEventListener("click", () => {
+    const isGameOver = getGameOver();
+    const chessTurn = getChessTurn();
     if (isGameOver) {
-        document.getElementById("info_status").textContent = "ゲームは終了しています";
+        messageStatus("ゲームは終了しています");
         return;
     }
+    let selectPiece = null;
+    deleteHighlight();
     setGameOver(true);
-    document.getElementById("info_move").textContent = "";
-    document.getElementById("info_status").textContent = `サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`;
+    messageTurn();
+    messageWin();
+    messageStatus(`サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`);
 });
-export {renderPieces,resetGame};
