@@ -8,10 +8,11 @@
 */
 
 //ゲーム制御
-import {yoko,summonPiece,promotion,findPiece,getDivision} from './piece.js';
+import {yoko,summonPiece,promotion,deletePiece,findPiece,getDivision} from './piece.js';
 import {checkMovable} from './definemove.js';
 import {setChessTurn,addLog,simulateCheck,getGameOver,setGameOver, getChessTurn,startGame} from "./controll.js";
-import {summonBoard,deleteHighlight,renderPieces,messageStatus,messageMove,messageWin,messageTurn} from './graphics.js';
+import {summonBoard,highlightCell,highlightCells,deleteHighlight,renderPieces,
+        messageStatus,messageMove,messageWin,messageTurn} from './graphics.js';
 import {debug_chesscheckmate} from './debug.js';
 
 //========メインパーツ========
@@ -48,12 +49,13 @@ export function clicked(e){//未来の自分がリファクタするはず
             let info_statusText = "";
             if(targetPiece && targetPiece.chess !== selectPiece.chess){//敵コマ撃破
                 const defeatedSymbol = targetPiece.symbol;
-                targetPiece.axis = "i";
+                deletePiece(targetPiece);
                 info_statusText = (defeatedSymbol || "不明") + "を撃破しました";
                 if(targetPiece.rank === "king"){
                 setGameOver(true);
+                messageWin();
                 info_statusText = `${chessTurn ? "王将" : "キング"}が撃破されました。${chessTurn ? "チェス" : "将棋"}の勝利です`;
-                messageTurn(null);
+                messageTurn();
             }
             }
             selectPiece.axis = clickedId;//axis値代入して移動処理
@@ -70,6 +72,8 @@ export function clicked(e){//未来の自分がリファクタするはず
             if (moveResult.opponentCheckmate && !isGameOver) {
                 setGameOver(true);
                 info_statusText =`チェックメイトです。${chessTurn ? "チェス" : "将棋"}の勝利です`;
+                messageWin();
+                messageTurn();
             } else {
                 if (moveResult.opponentCheck && !isGameOver) {
                     info_statusText = info_statusText ? `${info_statusText} チェックです` : "チェックです";
@@ -93,12 +97,9 @@ export function clicked(e){//未来の自分がリファクタするはず
         if (found){//コマがいるかどうか
             if (found.chess === chessTurn) {//おまえのターンか
                 selectPiece = found;
-                e.currentTarget.style.backgroundColor = "yellow";
+                highlightCell(clickedId, "yellow");
                 legalMoves = checkMovable(found);
-                legalMoves.forEach(id => {
-                    const cell = document.getElementById(id);
-                    if (cell) cell.style.backgroundColor = "lightgreen";
-                });
+                highlightCells(legalMoves, "lightgreen");
                 messageStatus("コマを選択しました");
             }else {//↑=false
                 messageStatus("相手のターンです");
@@ -108,27 +109,3 @@ export function clicked(e){//未来の自分がリファクタするはず
         }
     }
 }
-
-//========ボタン========
-//ß終了時にたぶんかえる
-const button = document.querySelector("#reset");
-button.addEventListener("click", () => {
-    startGame();
-    console.log("reset succeed");
-});
-
-const surrenderButton = document.querySelector("#surrender");
-surrenderButton.addEventListener("click", () => {
-    const isGameOver = getGameOver();
-    const chessTurn = getChessTurn();
-    if (isGameOver) {
-        messageStatus("ゲームは終了しています");
-        return;
-    }
-    let selectPiece = null;
-    deleteHighlight();
-    setGameOver(true);
-    messageTurn();
-    messageWin();
-    messageStatus(`サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`);
-});

@@ -1,7 +1,7 @@
 //dom操作とかメッセージとか
 import {yoko , getDivision , summonPiece } from "./piece.js";
 import {clicked}from './main.js'
-import { getChessTurn, getGameOver } from "./controll.js";
+import { getChessTurn, getGameOver, setGameOver, startGame} from "./controll.js";
 
 //========piece描画関連========
 function renderPieces() {//ボードをdivision.axisの値に更新
@@ -19,9 +19,6 @@ function renderPieces() {//ボードをdivision.axisの値に更新
     }
 }
 
-function deleteHighlight() {//highlightをdeleteする
-    document.querySelectorAll(".cell").forEach(td => td.style.backgroundColor = "");
-}
 
 function summonBoard() {//ボードの初期設定
     let board = document.getElementById("board");
@@ -41,14 +38,23 @@ function summonBoard() {//ボードの初期設定
     renderPieces();
 }
 
+//========ハイライト========
+function deleteHighlight() {//highlightをdeleteする
+    document.querySelectorAll(".cell").forEach(td => td.style.backgroundColor = "");
+}
+const makeHighLight = (cell,color)=>{
+    cell.style.backgroundColor = color;
+}
+const highlightCell = (id, color) => {
+    const cell = document.getElementById(id);
+    if (cell) makeHighLight(cell, color);
+};
+const highlightCells = (ids, color) => {
+    ids.forEach(id => highlightCell(id, color));
+};
 //========メッセ========
 const messageStatus = (content) => {
-    const isChessTurn = getChessTurn();
-    if(content == null){
-        document.getElementById("info_status").textContent = "";
-    }else{
     document.getElementById("info_status").textContent = content;
-    }
 }
 const messageMove = (toId) =>{
     if(toId == null){
@@ -71,4 +77,28 @@ const messageTurn = ()=>{
     }
 }
 
-export {renderPieces,summonBoard,deleteHighlight,messageStatus,messageMove,messageWin,messageTurn}
+//========ボタン========
+//ß終了時にたぶんかえる
+const button = document.querySelector("#reset");
+button.addEventListener("click", () => {
+    startGame();
+    console.log("reset succeed");
+});
+
+const surrenderButton = document.querySelector("#surrender");
+surrenderButton.addEventListener("click", () => {
+    const isGameOver = getGameOver();
+    const chessTurn = getChessTurn();
+    if (isGameOver) {
+        messageStatus("ゲームは終了しています");
+        return;
+    }
+    let selectPiece = null;
+    deleteHighlight();
+    setGameOver(true);
+    messageTurn();
+    messageWin();
+    messageStatus(`サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`);
+});
+export {renderPieces,summonBoard,makeHighLight,highlightCell,highlightCells,deleteHighlight,
+        messageStatus,messageMove,messageWin,messageTurn}

@@ -12,7 +12,7 @@ const startGame=()=>{
     renderPieces();
     deleteHighlight();
     messageMove(null);
-    messageStatus(null);
+    messageStatus("");
 }
 
 //========ログとか=======
