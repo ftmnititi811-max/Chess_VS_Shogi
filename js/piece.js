@@ -58,7 +58,7 @@ const movePiece = (piece,to) => {//pieceをtoへうごかす
     piece.axis = to;
 }
 const deletePiece = (piece) =>{//pieceをヨコ座標iへ飛ばす
-    piece.axis[0] = i;
+    piece.axis = "i";
 }
 
 function promotion(piece) {//成るやつ
