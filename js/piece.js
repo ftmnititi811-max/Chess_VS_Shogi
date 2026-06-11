@@ -39,6 +39,9 @@ function summonPiece(){//division内の配列にobjectでコマと初期座標�
     division[31] = new piece(false,"silver","銀","f9")
     division[32] = new piece(false,"knight","桂","g9")
     division[33] = new piece(false,"lance","香","h9")
+
+    division[34] = new piece(false,"pawn","歩","f0")
+    division[35] = new piece(false,"gold","金","g0")
 }
 
 //========読み取り/書き換え========
@@ -54,11 +57,23 @@ function getDivision() {
     return division;
 }
 
-const movePiece = (piece,to) => {//pieceをtoへうごかす
+const movePiece = (piece,to) =>{//pieceをtoへうごかす
     piece.axis = to;
 }
 const deletePiece = (piece) =>{//pieceをヨコ座標iへ飛ばす
     piece.axis = "i";
+}
+
+const checkPromotable = (piece,to) =>{//成れるかちぇっく
+    if(piece.chess === true && piece.rank === "pawn" && to[1] === "9" && piece.axis[1] !== "0"){
+        return true;
+    }else if(piece.chess === false){
+        if(to[1] <= "3" && (piece.rank !== "gold" && piece.rank !== "king" && piece.rank !== "horse" && piece.rank !== "dragon")&& piece.axis[1] !== "0" ){
+            return true;
+        }
+        return false;
+    }else
+        return false;
 }
 
 function promotion(piece) {//成るやつ
@@ -80,6 +95,5 @@ export {yoko, tate,
         summonPiece,
         findPiece,getDivision,
         movePiece,deletePiece,
-        promotion,
-        division
+        checkPromotable,promotion,
         };

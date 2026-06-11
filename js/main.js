@@ -8,7 +8,7 @@
 */
 
 //ゲーム制御
-import {yoko,summonPiece,promotion,deletePiece,findPiece,getDivision} from './piece.js';
+import {yoko,tate,summonPiece,checkPromotable,promotion,deletePiece,findPiece,getDivision,movePiece} from './piece.js';
 import {checkMovable} from './definemove.js';
 import {setChessTurn,addLog,simulateCheck,getGameOver,setGameOver, getChessTurn,startGame} from "./controll.js";
 import {summonBoard,highlightCell,highlightCells,deleteHighlight,renderPieces,
@@ -56,18 +56,17 @@ export function clicked(e){//未来の自分がリファクタするはず
                 messageWin();
                 info_statusText = `${chessTurn ? "王将" : "キング"}が撃破されました。${chessTurn ? "チェス" : "将棋"}の勝利です`;
                 messageTurn();
-            }
-            }
-            selectPiece.axis = clickedId;//axis値代入して移動処理
-            if ((selectPiece.axis[1] === "9" && selectPiece.chess === true) || (selectPiece.axis[1] === "1"||selectPiece.axis[1] === "2"||selectPiece.axis[1] === "3" && selectPiece.chess === false)){
-                if((selectPiece.rank === "pawn"||selectPiece.rank === "lance"||selectPiece.rank === "silver")||(selectPiece.chess === false && selectPiece.rank === "knight"||selectPiece.rank === "rook"||selectPiece.rank === "bishop")){
-                    const promote = confirm("成りますか？");//成り判定
-                    if (promote){
-                    promotion(selectPiece);
-                    console.log("promote success");
-                    }
                 }
             }
+            const canPromote = checkPromotable(selectPiece,clickedId);
+            if (canPromote){
+                const promote = confirm("成りますか？");//成り判定
+                if (promote){
+                    promotion(selectPiece);
+                    console.log("promote success");
+                }
+            }
+            movePiece(selectPiece, clickedId);            
             messageMove(clickedId);
             if (moveResult.opponentCheckmate && !isGameOver) {
                 setGameOver(true);
@@ -96,11 +95,31 @@ export function clicked(e){//未来の自分がリファクタするはず
         const found = findPiece(clickedId);
         if (found){//コマがいるかどうか
             if (found.chess === chessTurn) {//おまえのターンか
-                selectPiece = found;
-                highlightCell(clickedId, "yellow");
-                legalMoves = checkMovable(found);
-                highlightCells(legalMoves, "lightgreen");
-                messageStatus("コマを選択しました");
+                if(found.axis === "f0"||found.axis === "g0"){//それが持ち駒か
+                    const canPlaceHasPiece =()=>{
+                            const emptySquares = [];
+                            for (let i = 0; i < yoko.length; i++) {
+                                for (let j = 0; j < tate.length; j++) {
+                                    const cellId = yoko[i] + tate[j];
+                                    if (findPiece(cellId) === null) {
+                                        emptySquares.push(cellId);
+                                    }
+                                }
+                            }
+                            return emptySquares;
+                        }
+                    selectPiece = found;
+                    highlightCell(clickedId, "yellow");
+                    legalMoves = canPlaceHasPiece();
+                    highlightCells(legalMoves, "lightgreen");
+                    messageStatus("持ち駒を選択しました");
+                }else{
+                    selectPiece = found;
+                    highlightCell(clickedId, "yellow");
+                    legalMoves = checkMovable(found);
+                    highlightCells(legalMoves, "lightgreen");
+                    messageStatus("コマを選択しました");
+                }
             }else {//↑=false
                 messageStatus("相手のターンです");
             }

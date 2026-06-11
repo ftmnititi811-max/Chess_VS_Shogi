@@ -23,6 +23,32 @@ function renderPieces() {//ボードをdivision.axisの値に更新
 function summonBoard() {//ボードの初期設定
     let board = document.getElementById("board");
     board.innerHTML = "";
+        //将棋プレイヤー名表示
+        const topHeader = document.createElement("tr");
+        const topNameTh = document.createElement("th");
+        topNameTh.colSpan = 5;
+        topNameTh.id = "player_shogi_name";
+        topNameTh.textContent = "将棋プレイヤー";
+        topHeader.appendChild(topNameTh);
+        //将棋持ち駒
+        for(let i = 0; i < 2; i++){
+            const topHasPieceTh = document.createElement("th");
+            topHasPieceTh.colSpan = 1;
+            topHasPieceTh.className = "hasCell cell";
+            topHasPieceTh.id = yoko[5+i]+"0";
+            topHasPieceTh.textContent = "";
+            topHasPieceTh.onclick = clicked
+            topHeader.appendChild(topHasPieceTh);
+        }
+        //将棋サレンダーボタン
+        const topSurTh = document.createElement("th");
+        topSurTh.colSpan = 1;
+        topSurTh.className = "surButton";
+        topSurTh.textContent = "降参";
+        topSurTh.onclick = surrender;
+        topHeader.appendChild(topSurTh);
+        board.appendChild(topHeader);
+
     for (let i = 0; i < 9; i++ ){
         let tr = document.createElement("tr");
         for (let ii = 0; ii < 8 ; ii++){
@@ -34,6 +60,22 @@ function summonBoard() {//ボードの初期設定
         }
         board.appendChild(tr);
     }
+        //チェスプレイヤー名表示
+        const bottomHeader = document.createElement("tr");
+        const bottomTh = document.createElement("th");
+        bottomTh.colSpan = 7;
+        bottomTh.id = "player_chess_name";
+        bottomTh.textContent = "チェスプレイヤー";
+        bottomHeader.appendChild(bottomTh);
+        //チェスサレンダーボタン
+        const bottomSurTh = document.createElement("th");
+        bottomSurTh.colSpan = 1;
+        bottomSurTh.className = "surButton";
+        bottomSurTh.textContent = "I Resign";
+        bottomSurTh.onclick = surrender;
+        bottomHeader.appendChild(bottomSurTh);
+        board.appendChild(bottomHeader);
+
     summonPiece();
     renderPieces();
 }
@@ -73,7 +115,7 @@ const messageTurn = ()=>{
     if(!isGameOver){
         document.getElementById("info_turn").textContent = `${isChessTurn ? "チェス" : "将棋"}のターンです`;
     }else{
-        document.getElementById("info_turn").textContent = "ゲームは終了しました"
+        document.getElementById("info_turn").textContent = ""
     }
 }
 
@@ -85,8 +127,7 @@ button.addEventListener("click", () => {
     console.log("reset succeed");
 });
 
-const surrenderButton = document.querySelector("#surrender");
-surrenderButton.addEventListener("click", () => {
+const surrender = () => {
     const isGameOver = getGameOver();
     const chessTurn = getChessTurn();
     if (isGameOver) {
@@ -99,6 +140,6 @@ surrenderButton.addEventListener("click", () => {
     messageTurn();
     messageWin();
     messageStatus(`サレンダーされました。${chessTurn ? "将棋" : "チェス"}の勝利です`);
-});
+}
 export {renderPieces,summonBoard,makeHighLight,highlightCell,highlightCells,deleteHighlight,
         messageStatus,messageMove,messageWin,messageTurn}

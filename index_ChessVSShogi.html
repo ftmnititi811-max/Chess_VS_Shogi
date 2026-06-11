@@ -7,16 +7,17 @@
     </head>
     <body>
         <main>
-            <table id="board"></table>
-            <p id="info_turn"></p><!--ターン関連 どっちのターンかとかがめおべらとか-->
-            <p id="info_move"></p><!--どこ動いたかとチェック/王手 あと勝利も-->
-            <p id="info_status"></p><!--他のやつ-->
+            <div>
+                <table id="board"></table>
+            </div>
+            <p class="info" id="info_turn"></p><!--ターン関連 どっちのターンかとかがめおべらとか-->
+            <p class="info" id="info_move"></p><!--どこ動いたかとチェック/王手 あと勝利も-->
+            <p class="info" id="info_status"></p><!--他のやつ-->
             <button id="reset">リセット</button>
-            <button id="surrender">サレンダー</button>
         </main>
         <footer>
-            <p class="credit">ゲームを遊びたくて作ったはいいが自分はチェスも将棋も打てないっていうね</p>
-            <p class="credit">made by nititi811</p>
+            <p>ゲームを遊びたくて作ったはいいが自分はチェスも将棋も打てないっていうね</p>
+            <p>©2026 made by nititi811</p>
         </footer>
         <script type="module" src="./js/main.js"></script>
     </body>

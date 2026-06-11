@@ -1,14 +1,40 @@
-.credit{
-    color: gray;
-    font-size: 10px;
+body{
+    background-color:silver;
 }
-#board{
-    background-color: black;
-}
-td.cell{
+
+td.cell {
     background-color: antiquewhite;
     width: 64px;
     height: 64px;
     font-size: 48px;
     text-align: center;
+}
+
+#board {
+    align-self: center;
+    background-color: black;
+    th {
+        background-color:saddlebrown;
+        color: white;
+        text-align: center;
+    }
+    .hasCell{
+        font-size:34px;
+        color:black;
+    }
+    #player_chess_name{
+        padding:14px 10px;
+    }
+} 
+
+.info{
+    color:black;
+    font-size:18px;
+    font-weight: 500;
+}
+
+footer {
+    color: white;
+    font-size: 10px;
+    font-weight: lighter;
 }
